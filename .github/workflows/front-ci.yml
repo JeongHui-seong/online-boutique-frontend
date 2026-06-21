@@ -33,7 +33,7 @@ jobs:
         context: .
         platforms: linux/amd64
         push: true
-        tags: hshs99/frontend:latest # 또는 커밋 번호 버전
+        tags: hshs99/frontend:${{ github.sha }} # 또는 커밋 번호 버전
 
 # 🌟 [핵심 자동화] ArgoCD 저장소를 가져와서 YAML 파일 내부의 이미지 태그를 방금 만든 고유 번호로 치환 후 push합니다.
     - name: Update Kubernetes Manifest in ArgoCD Repo
