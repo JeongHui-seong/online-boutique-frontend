@@ -68,7 +68,7 @@ jobs:
             exit 1 # ❌ 스크립트를 강제 실패시켜 롤백 스텝으로 던집니다.
           fi
           echo "정상 구동 중... ($i/12)"
-          幕 sleep 10
+          sleep 10
         done
 
     # 3단계: 자동 롤백 (Web Health Check 실패 시에만 발동!)
