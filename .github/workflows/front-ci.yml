@@ -35,7 +35,7 @@ jobs:
         push: true
         tags: hshs99/frontend:${{ github.sha }} # 또는 커밋 번호 버전
 
-# 🌟 [핵심 자동화] ArgoCD 저장소를 가져와서 YAML 파일 내부의 이미지 태그를 방금 만든 고유 번호로 치환 후 push합니다.
+# ArgoCD 저장소를 가져와서 YAML 파일 내부의 이미지 태그를 방금 만든 고유 번호로 치환 후 push
     - name: Update Kubernetes Manifest in ArgoCD Repo
       run: |
         # 1. ArgoCD 배포 명세서 저장소를 가상 컴퓨터에 clone 받기
@@ -50,4 +50,41 @@ jobs:
         git config --global user.name "Github Actions - jhs"
         git add .
         git commit -m "Automated deployment: update frontend image to ${{ github.sha }} version"
+        git push origin main
+
+# ArgoCD가 동기화하고 파드를 롤링 업데이트할 때까지 '기다려준 후' 헬스체크 시작
+    - name: Web Health Check
+      run: |
+        echo "ArgoCD가 클러스터에 새 파드를 반영할 때까지 40초간 대기합니다..."
+        sleep 40 # Push 직후 바로 헬스체크를 하면 옛날 정상 파드에 테스트하게 되므로, 새 파드가 뜰 시간을 줍니다.
+
+        echo "프론트엔드 상태 감시를 시작합니다 (총 2분)"
+        # 10번 반복하며 10초마다 찌르기 (총 120초 감시)
+        for i in {1..10}; do
+          STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Host: shop.jhs-k8s.kro.kr" https://${{ secrets.LB_DOMAIN }})
+          
+          if [ "$STATUS_CODE" != "200" ]; then
+            echo "🚨 경고: 프론트엔드 상태 이상 발견! (Status Code: $STATUS_CODE)"
+            exit 1 # ❌ 스크립트를 강제 실패시켜 롤백 스텝으로 던집니다.
+          fi
+          echo "정상 구동 중... ($i/12)"
+          幕 sleep 10
+        done
+
+    # 3단계: 자동 롤백 (Web Health Check 실패 시에만 발동!)
+    - name: Automated Rollback on Failure
+      if: failure() 
+      run: |
+        echo "❌ 배포 장애 감지! ArgoCD Manifest 레포지토리로 이동하여 롤백을 수행합니다."
+        
+        # 1단계에서 다운받았던 배포 명세서 폴더로 다시 진입합니다.
+        cd argocd-repo
+        
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # 방금 1단계에서 수정한 '이미지 태그 변경 커밋'을 그대로 취소(Revert)합니다.
+        git revert --no-edit HEAD
+        
+        # 이전 정상 태그 명세서 상태로 강제 푸시 ➡️ ArgoCD가 복구 시작!
         git push origin main
