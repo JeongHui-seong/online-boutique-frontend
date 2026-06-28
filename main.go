@@ -171,12 +171,12 @@ func main() {
 	log.Fatal(http.ListenAndServe(addr+":"+srvPort, handler))
 
 	// 헬스체크 경로로 들어오면 정상(200) 대신 일부러 500 에러나 대기 상태를 유발
-	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError) // 🌟 일부러 500 Internal Server Error 반환!
-		w.Write([]byte("가상 장애 발생!"))
-	})
+	// http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+	// 	w.WriteHeader(http.StatusInternalServerError) // 🌟 일부러 500 Internal Server Error 반환!
+	// 	w.Write([]byte("가상 장애 발생!"))
+	// })
 
-	http.ListenAndServe(":8080", nil)
+	// http.ListenAndServe(":8080", nil)
 }
 func initStats(log logrus.FieldLogger) {
 	// TODO(arbrown) Implement OpenTelemtry stats
