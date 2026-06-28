@@ -93,7 +93,6 @@ func main() {
 	log := logrus.New()
 	log.Level = logrus.DebugLevel
 	log.Formatter = &logrus.JSONFormatter{
-		ㅏㅓㅇ퓨ㅗ마ㅓ니횢로;ㅏㅣ홤
 		FieldMap: logrus.FieldMap{
 			logrus.FieldKeyTime:  "timestamp",
 			logrus.FieldKeyLevel: "severity",
@@ -111,11 +110,11 @@ func main() {
 
 	baseUrl = os.Getenv("BASE_URL")
 
-	if os.Getenv("ENABLE_TRACING") == "1" {ㅁㄴㅇㅁㄴㅇ
+	if os.Getenv("ENABLE_TRACING") == "1" {
 		log.Info("Tracing enabled.")
 		initTracing(log, ctx, svc)
 	} else {
-		log.Info("Tracing disabled.")ㅁㄴㅇ
+		log.Info("Tracing disabled.")
 	}
 
 	if os.Getenv("ENABLE_PROFILER") == "1" {
@@ -144,7 +143,7 @@ func main() {
 	mustConnGRPC(ctx, &svc.cartSvcConn, svc.cartSvcAddr)
 	mustConnGRPC(ctx, &svc.recommendationSvcConn, svc.recommendationSvcAddr)
 	mustConnGRPC(ctx, &svc.shippingSvcConn, svc.shippingSvcAddr)
-	mustConnGRPC(ctx, &svc.checkoutSvcConn, svc.checkoutSvcAddr)ㅁㄴㅇㅁㄴㅇㅁㄴ
+	mustConnGRPC(ctx, &svc.checkoutSvcConn, svc.checkoutSvcAddr)
 	mustConnGRPC(ctx, &svc.adSvcConn, svc.adSvcAddr)
 
 	r := mux.NewRouter()
@@ -170,10 +169,18 @@ func main() {
 
 	log.Infof("starting server on %s:%s", addr, srvPort)
 	log.Fatal(http.ListenAndServe(addr+":"+srvPort, handler))
+
+	// 헬스체크 경로로 들어오면 정상(200) 대신 일부러 500 에러나 대기 상태를 유발
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError) // 🌟 일부러 500 Internal Server Error 반환!
+		w.Write([]byte("가상 장애 발생!"))
+	})
+
+	http.ListenAndServe(":8080", nil)
 }
 func initStats(log logrus.FieldLogger) {
 	// TODO(arbrown) Implement OpenTelemtry stats
-}ㅁㄴㅇㅁㄴㅇㅁㄴㅇ
+}
 
 func initTracing(log logrus.FieldLogger, ctx context.Context, svc *frontendServer) (*sdktrace.TracerProvider, error) {
 	mustMapEnv(&svc.collectorAddr, "COLLECTOR_SERVICE_ADDR")
