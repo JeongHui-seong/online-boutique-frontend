@@ -93,6 +93,7 @@ func main() {
 	log := logrus.New()
 	log.Level = logrus.DebugLevel
 	log.Formatter = &logrus.JSONFormatter{
+		ㅏㅓㅇ퓨ㅗ마ㅓ니횢로;ㅏㅣ홤
 		FieldMap: logrus.FieldMap{
 			logrus.FieldKeyTime:  "timestamp",
 			logrus.FieldKeyLevel: "severity",
@@ -110,11 +111,11 @@ func main() {
 
 	baseUrl = os.Getenv("BASE_URL")
 
-	if os.Getenv("ENABLE_TRACING") == "1" {
+	if os.Getenv("ENABLE_TRACING") == "1" {ㅁㄴㅇㅁㄴㅇ
 		log.Info("Tracing enabled.")
 		initTracing(log, ctx, svc)
 	} else {
-		log.Info("Tracing disabled.")
+		log.Info("Tracing disabled.")ㅁㄴㅇ
 	}
 
 	if os.Getenv("ENABLE_PROFILER") == "1" {
@@ -143,7 +144,7 @@ func main() {
 	mustConnGRPC(ctx, &svc.cartSvcConn, svc.cartSvcAddr)
 	mustConnGRPC(ctx, &svc.recommendationSvcConn, svc.recommendationSvcAddr)
 	mustConnGRPC(ctx, &svc.shippingSvcConn, svc.shippingSvcAddr)
-	mustConnGRPC(ctx, &svc.checkoutSvcConn, svc.checkoutSvcAddr)
+	mustConnGRPC(ctx, &svc.checkoutSvcConn, svc.checkoutSvcAddr)ㅁㄴㅇㅁㄴㅇㅁㄴ
 	mustConnGRPC(ctx, &svc.adSvcConn, svc.adSvcAddr)
 
 	r := mux.NewRouter()
@@ -172,7 +173,7 @@ func main() {
 }
 func initStats(log logrus.FieldLogger) {
 	// TODO(arbrown) Implement OpenTelemtry stats
-}
+}ㅁㄴㅇㅁㄴㅇㅁㄴㅇ
 
 func initTracing(log logrus.FieldLogger, ctx context.Context, svc *frontendServer) (*sdktrace.TracerProvider, error) {
 	mustMapEnv(&svc.collectorAddr, "COLLECTOR_SERVICE_ADDR")
