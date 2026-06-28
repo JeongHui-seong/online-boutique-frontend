@@ -61,7 +61,7 @@ jobs:
         echo "프론트엔드 상태 감시를 시작합니다 (총 2분)"
         # 10번 반복하며 10초마다 찌르기 (총 120초 감시)
         for i in {1..10}; do
-          STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Host: shop.jhs-k8s.kro.kr" https://${{ secrets.LB_DOMAIN }})
+          STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Host: shop.jhs-dev.cloud" https://${{ secrets.LB_DOMAIN }})
           
           if [ "$STATUS_CODE" != "200" ]; then
             echo "🚨 경고: 프론트엔드 상태 이상 발견! (Status Code: $STATUS_CODE)"
