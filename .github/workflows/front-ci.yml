@@ -56,11 +56,12 @@ jobs:
     - name: Web Health Check
       run: |
         echo "ArgoCD가 클러스터에 새 파드를 반영할 때까지 40초간 대기"
-        sleep 90 # Push 직후 바로 헬스체크를 하면 옛날 정상 파드에 테스트하게 되므로, 새 파드가 뜰 시간을 기다려줌
+        sleep 150 # Push 직후 바로 헬스체크를 하면 옛날 정상 파드에 테스트하게 되므로, 새 파드가 뜰 시간을 기다려줌
 
         echo "프론트엔드 상태 검사"
         for i in {1..10}; do
           STATUS_CODE=$(curl -k -o /dev/null -s -w "%{http_code}" "https://${{ secrets.LB_DOMAIN }}")
+          echo "시도 $i: HTTP $STATUS_CODE"
           
           if [ "$STATUS_CODE" = "200" ]; then
             echo "정상 작동"
